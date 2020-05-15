@@ -1,0 +1,14 @@
+﻿  DistributedProject.cpp
+c1xx : warning C4199: two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP; use /Zc:twoPhase-
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(208): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(231): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(237): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(243): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(282): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(288): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(296): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(333): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(339): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(347): warning C4018: '<': signed/unsigned mismatch
+c:\users\omar hazem\source\repos\distributedproject\distributedproject\distributedproject.cpp(402): warning C4101: 'i': unreferenced local variable
+  DistributedProject.vcxproj -> C:\Users\Omar Hazem\source\repos\DistributedProject\Debug\DistributedProject.exe
