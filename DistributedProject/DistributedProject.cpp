@@ -25,7 +25,14 @@ struct codon
 	int count; 
 };
 
+struct protein
+{
+	string name;
+	int count;
+	string codon[6]; 
 
+
+};
 
 
 
@@ -107,6 +114,201 @@ void get_lines(string filename , vector<string> &bar)
 
 
 }
+
+
+
+
+
+
+
+
+
+void ProteinsVector_Intialization(vector<protein> &ProteinsVector)
+{
+
+	ProteinsVector[0].name = "Phe";
+	ProteinsVector[0].codon[0] = "ttt";
+	ProteinsVector[0].codon[1] = "ttc";
+
+
+	ProteinsVector[1].name = "Leu";
+	ProteinsVector[1].codon[0] = "tta";
+	ProteinsVector[1].codon[1] = "ttg";
+	ProteinsVector[1].codon[2] = "ctt";
+	ProteinsVector[1].codon[3] = "ctc";
+	ProteinsVector[1].codon[4] = "cta";
+	ProteinsVector[1].codon[5] = "ctg";
+
+
+
+
+	ProteinsVector[2].name = "Lle";
+	ProteinsVector[2].codon[0] = "att";
+	ProteinsVector[2].codon[1] = "atc";
+	ProteinsVector[2].codon[2] = "ata";
+	
+
+
+	ProteinsVector[3].name = "Met";
+	ProteinsVector[3].codon[0] = "atg";
+	
+
+	ProteinsVector[4].name = "Val";
+	ProteinsVector[4].codon[0] = "gtt";
+	ProteinsVector[4].codon[1] = "gtc";
+	ProteinsVector[4].codon[2] = "gta";
+	ProteinsVector[4].codon[3] = "gtg";
+
+
+	ProteinsVector[5].name = "Ser";
+	ProteinsVector[5].codon[0] = "tct";
+	ProteinsVector[5].codon[1] = "tcc";
+	ProteinsVector[5].codon[2] = "tca";
+	ProteinsVector[5].codon[3] = "tcg";
+	ProteinsVector[5].codon[4] = "agt";
+	ProteinsVector[5].codon[5] = "agc";
+
+
+
+
+
+	ProteinsVector[6].name = "Pro";
+	ProteinsVector[6].codon[0] = "cct";
+	ProteinsVector[6].codon[1] = "ccc";
+	ProteinsVector[6].codon[2] = "cca";
+	ProteinsVector[6].codon[2] = "ccg";
+
+
+	
+	
+	ProteinsVector[7].name = "Thr";
+	ProteinsVector[7].codon[0] = "act";
+	ProteinsVector[7].codon[1] = "acc";
+	ProteinsVector[7].codon[2] = "aca";
+	ProteinsVector[7].codon[2] = "acg";
+
+
+	ProteinsVector[8].name = "Ala";
+	ProteinsVector[8].codon[0] = "gct";
+	ProteinsVector[8].codon[1] = "gcc";
+	ProteinsVector[8].codon[2] = "gca";
+	ProteinsVector[8].codon[2] = "gcg";
+
+
+
+
+
+
+	
+	ProteinsVector[9].name = "Tyr";
+	ProteinsVector[9].codon[0] = "tat";
+	ProteinsVector[9].codon[1] = "tac";
+	
+
+
+	ProteinsVector[10].name = "His";
+	ProteinsVector[10].codon[0] = "cat";
+	ProteinsVector[10].codon[1] = "cac";
+	
+
+
+	ProteinsVector[11].name = "Gln";
+	ProteinsVector[11].codon[0] = "caa";
+	ProteinsVector[11].codon[1] = "cag";
+	
+
+	ProteinsVector[12].name = "Asn";
+	ProteinsVector[12].codon[0] = "aat";
+	ProteinsVector[12].codon[1] = "aac";
+
+
+
+	
+
+	
+	
+	ProteinsVector[13].name = "Lys";
+	
+	ProteinsVector[13].codon[0] = "aaa";
+	ProteinsVector[13].codon[1] = "aag";
+
+	
+	
+	
+	ProteinsVector[14].name = "Asp";
+	ProteinsVector[14].codon[0] = "gat";
+	ProteinsVector[14].codon[1] = "gac";
+
+
+
+	
+	
+	
+	ProteinsVector[15].name = "Glu";
+	ProteinsVector[15].codon[0] = "gaa";
+	ProteinsVector[15].codon[1] = "gag";
+
+
+	
+	
+	
+	ProteinsVector[16].name = "Cys";
+	ProteinsVector[16].codon[0] = "tgt";
+	ProteinsVector[16].codon[1] = "tgc";
+
+
+
+
+	ProteinsVector[17].name = "Trp";
+	ProteinsVector[17].codon[0] = "tgg";
+
+
+
+
+	ProteinsVector[18].name = "Arg";
+	ProteinsVector[18].codon[0] = "aga";
+	ProteinsVector[18].codon[1] = "agg";
+	
+
+
+
+
+
+
+
+
+	ProteinsVector[19].name = "Gly";
+	ProteinsVector[19].codon[0] = "ggt";
+	ProteinsVector[19].codon[1] = "ggc";
+	ProteinsVector[19].codon[2] = "gga";
+	ProteinsVector[19].codon[3] = "ggg";
+
+	for (int i = 0; i < 20; i++)
+	{
+		ProteinsVector[i].count = 0;
+
+	}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void CondonsVector_Intialization(vector<codon> &CondonsVector)
@@ -327,37 +529,43 @@ void OpenMPParallelExecution(vector<codon> &CondonsVector, vector<string> &my_ve
 
 
 
-void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string> &my_vector)
+void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string> &my_vector , vector<protein>&ProteinsVector)
 {
-
+	string temp;
 	int i, j, k;
-	cout << "please wait making data is bieng analyzed ..........." << endl;
+	cout << "please wait making data is being analyzed ..........." << endl;
 
-	string temp = "---";
-#pragma omp parallel  for  private(i) shared(CondonsVector)
+	
+#pragma omp  parallel for private(j,k,temp)
 	for (i = 0; i < my_vector.size(); i++)
 	{
+		 temp = "---";
 		int tid = omp_get_thread_num();
 		string cuurent_line = my_vector[i];
 		cout << cuurent_line << " is catched by thread : " << tid << endl;
-#pragma omp  parallel for private(j) shared(CondonsVector)
+
 		for (j = 0; j < cuurent_line.size(); j += 3)
 		{
-			tid = omp_get_thread_num();
+			
 			temp[0] = cuurent_line[j];
 			temp[1] = cuurent_line[(j)+1];
 			temp[2] = cuurent_line[(j)+2];
-			cout << temp << " is catched by thread : " << tid << endl;
-#pragma omp parallel for  private(k) shared(CondonsVector)
+ //#pragma omp critical
+	//		{
+		//		cout << temp << " is catched by thread : " << tid << endl;
+			//}
 			for (k = 0; k < CondonsVector.size(); k++)
 			{
 				if (temp == CondonsVector[k].name)
 				{
-					tid = omp_get_thread_num();
-					#pragma omp critical 
-					CondonsVector[k].count += 1;
-					cout << CondonsVector[k].name << " is catched by thread : " << tid << "and incremented by one" << endl;
-				}
+					
+					#pragma omp critical
+					{
+						CondonsVector[k].count += 1;
+					
+					//cout << CondonsVector[k].name << " is catched by thread : " << tid << "and incremented by one" << endl;
+					}
+					}
 
 			}
 
@@ -365,10 +573,94 @@ void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string
 
 		}
 
+
+
+		
+
+
+
 	}
 
 
-	printResults(CondonsVector);
+
+	cout << "Final Results  ..........." << endl;
+	int Sum = 0;
+#pragma omp  parallel for 
+
+	for (int k = 0; k < CondonsVector.size(); k++)
+	{
+		
+		cout << CondonsVector[k].name << " |" << " count :" << CondonsVector[k].count << endl;
+		Sum += CondonsVector[k].count;
+
+	}
+
+
+#pragma omp  parallel for  private (k , i)
+	for (int j = 0; j < 20; j++)
+	{
+		for (int k = 0; k < 64; k++)
+		{
+			
+			i = 0;
+			while (i < 6)
+			{
+				if (ProteinsVector[j].codon[i] == CondonsVector[k].name)
+				{
+#pragma omp critical
+					{
+						ProteinsVector[j].count += CondonsVector[k].count;
+					}
+				}
+				i++;
+			}
+		
+		
+		}
+	
+	
+	
+	
+
+ 
+
+
+	
+
+
+
+
+	
+	}
+
+
+
+	cout << "-----------------------------------------------------------------------------" << endl;
+//#pragma omp  parallel for 
+	float freq=0;
+	for (int k = 0; k < ProteinsVector.size(); k++)
+	{
+		 freq += float(ProteinsVector[k].count )/ float(Sum);
+		cout << ProteinsVector[k].name << " |" << " count :" << ProteinsVector[k].count << " | Frequency : "<< float (ProteinsVector[k].count)/float(Sum) *100 << endl;
+
+
+
+	}
+	cout << "-----------------------------------------------------------------------------" << endl;
+	cout << "-----------------------------------------------------------------------------" << endl;
+	cout << "-----------------------------------------------------------------------------" << endl;
+	cout << "-----------------------------------------------------------------------------" << endl;
+	cout << "-----------------------------------------------------------------------------" << endl;
+	cout << "-----------------------------------------------------------------------------" << endl;
+
+
+	cout << freq << endl;
+
+
+
+
+
+
 
 }
 
@@ -420,8 +712,12 @@ int main()
 
 
 	vector<codon> CondonsVector(64);
+
+	vector<protein> ProteinsVector(20);
+
 	CondonsVector_Intialization(CondonsVector);
-	OpenMPParallelExecutionSections(CondonsVector, my_vector);
+	ProteinsVector_Intialization(ProteinsVector);
+	OpenMPParallelExecutionSections(CondonsVector, my_vector, ProteinsVector);
 
 
 
