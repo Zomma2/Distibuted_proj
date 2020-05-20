@@ -123,7 +123,7 @@ void get_lines(string filename , vector<string> &bar)
 
 
 
-void ProteinsVector_Intialization(vector<protein> &ProteinsVector)
+void ProteinsVector_Intialization(vector<protein> &ProteinsVector , bool isForParallel)
 {
 
 	ProteinsVector[0].name = "Phe";
@@ -283,11 +283,34 @@ void ProteinsVector_Intialization(vector<protein> &ProteinsVector)
 	ProteinsVector[19].codon[2] = "gga";
 	ProteinsVector[19].codon[3] = "ggg";
 
-	for (int i = 0; i < 20; i++)
-	{
-		ProteinsVector[i].count = 0;
 
+
+	if (!isForParallel)
+	{
+
+		for (int i = 0; i < 20; i++)
+		{
+			ProteinsVector[i].count = 0;
+
+		}
 	}
+
+
+	else
+
+	{
+#pragma omp  parallel for 
+		for (int i = 0; i < 20; i++)
+		{
+			ProteinsVector[i].count = 0;
+
+		}
+
+
+	
+	}
+
+
 
 
 
@@ -311,7 +334,7 @@ void ProteinsVector_Intialization(vector<protein> &ProteinsVector)
 
 
 
-void CondonsVector_Intialization(vector<codon> &CondonsVector)
+void CondonsVector_Intialization(vector<codon> &CondonsVector , bool isForParallel )
 {
 
 	CondonsVector[0].name = "ttt";
@@ -387,17 +410,38 @@ void CondonsVector_Intialization(vector<codon> &CondonsVector)
 	CondonsVector[63].name = "ggg";
 
 
-
-
-	for (int i = 0; i < 64; i++)
+	if (!isForParallel)
 	{
-		CondonsVector[i].count = 0;
+		for (int i = 0; i < 64; i++)
+		{
+			CondonsVector[i].count = 0;
 
+		}
+	}
+
+	else
+	{
+
+#pragma omp  parallel for 
+		for (int i = 0; i < 64; i++)
+		{
+			CondonsVector[i].count = 0;
+
+		}
+
+	
+	
+	
 	}
 
 
-
 }
+
+
+
+
+
+
 
 
 
@@ -407,7 +451,7 @@ void printResults(vector<codon> &CondonsVector)
 	 
 	cout << "Final Results  ..........." << endl;
 
-	for (int k = 0; k < CondonsVector.size(); k++)
+	for (unsigned int k = 0; k < CondonsVector.size(); k++)
 	{
 		cout << CondonsVector[k].name << " |" << " count :" << CondonsVector[k].count << endl;
 
@@ -423,42 +467,123 @@ void printResults(vector<codon> &CondonsVector)
 
 
 
-void serialExecution(vector<codon> &CondonsVector, vector<string> &my_vector)
+void serialExecution(string FILE, vector<codon> &CondonsVector, vector<protein>&ProteinsVector)
 {
 
-	cout << "Please wait while data is being analyzed ..........." << endl;
 
-	string temp = "---";
 
-	for (int i = 0; i < my_vector.size(); i++)
+int count = getNumberOfLines(FILE);
+
+cout << "There's "<<count << "Lines" << endl;
+const int line_count = count ;
+
+vector<string> my_vector(line_count);
+get_lines(FILE , my_vector);
+
+
+
+CondonsVector_Intialization(CondonsVector ,false);
+ProteinsVector_Intialization(ProteinsVector, false);
+
+
+string temp;
+unsigned int i, j, k;
+cout << "please wait making data is being analyzed ..........." << endl;
+
+
+
+for (i = 0; i < my_vector.size(); i++)
+{
+	temp = "---";
+	string cuurent_line;
+
+	
+		int tid = omp_get_thread_num();
+		cuurent_line = my_vector[i];
+
+	
+	for (j = 0; j < cuurent_line.size(); j += 3)
 	{
-		
-		string cuurent_line = my_vector[i];
-		
 
-		for (int j = 0; j < cuurent_line.size(); j += 3)
-		{
+
+
+
+		
 			temp[0] = cuurent_line[j];
 			temp[1] = cuurent_line[(j)+1];
 			temp[2] = cuurent_line[(j)+2];
-			
-			for (int k = 0; k < CondonsVector.size(); k++)
+		
+
+		for (k = 0; k < CondonsVector.size(); k++)
+		{
+			if (temp == CondonsVector[k].name)
 			{
-				if (temp == CondonsVector[k].name)
-				{
+
+
 					CondonsVector[k].count += 1;
-					
-				}
 
+				
 			}
-
-
 
 		}
 
+
+
 	}
 
-	printResults(CondonsVector);
+
+
+
+
+
+
+}
+
+
+
+cout << "Final Results  ..........." << endl;
+int Sum = 0;
+
+for (unsigned int k = 0; k < CondonsVector.size(); k++)
+{
+
+	cout << CondonsVector[k].name << " |" << " count :" << CondonsVector[k].count << endl;
+	Sum += CondonsVector[k].count;
+	
+}
+
+
+
+for (int j = 0; j < 20; j++)
+{
+	for (int k = 0; k < 64; k++)
+	{
+
+		i = 0;
+		while (i < 6)
+		{
+			if (ProteinsVector[j].codon[i] == CondonsVector[k].name)
+			{
+
+					ProteinsVector[j].count += CondonsVector[k].count;
+				
+			}
+			i++;
+		}
+
+
+	}
+
+
+		cout << ProteinsVector[j].name << " |" << " count :" << ProteinsVector[j].count << " | Frequency : " << float(ProteinsVector[j].count) / float(Sum) * 100 << endl;
+	
+
+
+}
+
+
+
+
 
 }
 
@@ -467,60 +592,468 @@ void serialExecution(vector<codon> &CondonsVector, vector<string> &my_vector)
 
 
 
-
-
-
-
-void OpenMPParallelExecution(vector<codon> &CondonsVector, vector<string> &my_vector)
+void TrySections(string FILE, vector<codon> &CondonsVector, vector<protein>&ProteinsVector)
 {
-
-	int i, j, k;
-	cout << "please wait making data is bieng analyzed ..........." << endl;
-
-
-	string temp = "---";
-
-
-
-
-
-	for (i = 0; i < my_vector.size(); i++)
+	
+	int count;
+	
+	
+	
+#pragma omp parallel 
 	{
-		int tid = omp_get_thread_num();
-		string cuurent_line = my_vector[i];
-		cout << cuurent_line << " is catched by thread : " << tid << endl;
-
-
-
-		for (j = 0; j < cuurent_line.size(); j += 3)
+#pragma omp sections 
 		{
-			tid = omp_get_thread_num();
-			temp[0] = cuurent_line[j];
-			temp[1] = cuurent_line[(j)+1];
-			temp[2] = cuurent_line[(j)+2];
-			cout << temp << " is catched by thread : " << tid << endl;
-
-
-
-			for (k = 0; k < CondonsVector.size(); k++)
+# pragma omp section 
 			{
-				if (temp == CondonsVector[k].name)
+
+				count = getNumberOfLines(FILE);
+			}
+		}
+	}
+			const int line_count = count;
+			vector<string> my_vector(line_count);
+
+#pragma omp parallel 
+			{
+#pragma omp sections 
 				{
-					tid = omp_get_thread_num();
-					CondonsVector[k].count += 1;
-					cout << CondonsVector[k].name << " is catched by thread : " << tid << "and incremented by one" << endl;
-				}
+# pragma omp section 
+			{
+
+				get_lines(FILE, my_vector);
+
+			}
+	
+		
+#pragma omp section
+			{
+
+
+				CondonsVector_Intialization(CondonsVector ,false);
 
 			}
 
+#pragma omp section
+			{
+
+				ProteinsVector_Intialization(ProteinsVector , false);
 
 
+			}
+
+		
+		
+		
+		
 		}
+	
+	
+	
+	}
+	cout << "please wait making data is being analyzed ..........." << endl;
+
+
+
+
+#pragma omp parallel 
+	{
+
+#pragma omp sections 
+		{
+
+#pragma omp section
+			{ unsigned int i, j, k;
+				string temp = "---";
+				for (i = 0; i < my_vector.size()/4; i++)
+				{
+					temp = "---";
+					int tid = omp_get_thread_num();
+					string cuurent_line = my_vector[i];
+					cout << cuurent_line << " is catched by thread : " << tid << endl;
+
+					for (j = 0; j < cuurent_line.size(); j += 3)
+					{
+
+						temp[0] = cuurent_line[j];
+						temp[1] = cuurent_line[(j)+1];
+						temp[2] = cuurent_line[(j)+2];
+						for (k = 0; k < CondonsVector.size(); k++)
+						{
+							if (temp == CondonsVector[k].name)
+							{
+
+#pragma omp critical
+								{
+									CondonsVector[k].count += 1;
+
+								}
+							}
+
+						}
+
+
+
+					}
+
+				}
+
+
+			}
+		
+#pragma omp section
+			{
+				unsigned int i, j, k;
+				for (i = my_vector.size() / 4; i < my_vector.size() / 2; i++)
+				{
+					
+					string temp = "---";
+					temp = "---";
+					int tid = omp_get_thread_num();
+					string cuurent_line = my_vector[i];
+					cout << cuurent_line << " is catched by thread : " << tid << endl;
+
+					for (j = 0; j < cuurent_line.size(); j += 3)
+					{
+
+						temp[0] = cuurent_line[j];
+						temp[1] = cuurent_line[(j)+1];
+						temp[2] = cuurent_line[(j)+2];
+						for (k = 0; k < CondonsVector.size(); k++)
+						{
+							if (temp == CondonsVector[k].name)
+							{
+
+#pragma omp critical
+								{
+									CondonsVector[k].count += 1;
+
+								}
+							}
+
+						}
+
+
+
+					}
+
+				}
+
+
+			}
+		
+		
+
+#pragma omp section
+			{
+				unsigned int i, j, k;
+				for (i = my_vector.size() / 2; i < (3*my_vector.size()) / 4; i++)
+				{
+				
+					string temp = "---";
+					temp = "---";
+					int tid = omp_get_thread_num();
+					string cuurent_line = my_vector[i];
+					cout << cuurent_line << " is catched by thread : " << tid << endl;
+
+					for (j = 0; j < cuurent_line.size(); j += 3)
+					{
+
+						temp[0] = cuurent_line[j];
+						temp[1] = cuurent_line[(j)+1];
+						temp[2] = cuurent_line[(j)+2];
+						for (k = 0; k < CondonsVector.size(); k++)
+						{
+							if (temp == CondonsVector[k].name)
+							{
+
+#pragma omp critical
+								{
+									CondonsVector[k].count += 1;
+
+								}
+							}
+
+						}
+
+
+
+					}
+
+				}
+
+
+			}
+		
+#pragma omp section
+			{
+				unsigned int i, j, k;
+				for (i = (3 * my_vector.size()) / 4 ; i <  my_vector.size() / 4; i++)
+				{	
+					string temp = "---";
+					temp = "---";
+					int tid = omp_get_thread_num();
+					string cuurent_line = my_vector[i];
+					cout << cuurent_line << " is catched by thread : " << tid << endl;
+
+					for (j = 0; j < cuurent_line.size(); j += 3)
+					{
+
+						temp[0] = cuurent_line[j];
+						temp[1] = cuurent_line[(j)+1];
+						temp[2] = cuurent_line[(j)+2];
+						for (k = 0; k < CondonsVector.size(); k++)
+						{
+							if (temp == CondonsVector[k].name)
+							{
+
+#pragma omp critical
+								{
+									CondonsVector[k].count += 1;
+
+								}
+							}
+
+						}
+
+
+
+					}
+
+				}
+
+
+			}
+		
+		
+		
+		
+		}
+
+
 
 	}
 
 
-	printResults(CondonsVector);
+
+
+	cout << "Final Results  ..........." << endl;
+	int Sum = 0;
+	for (unsigned int k = 0; k < CondonsVector.size(); k++)
+	{
+
+		cout << CondonsVector[k].name << " |" << " count :" << CondonsVector[k].count << endl;
+		Sum += CondonsVector[k].count;
+
+	}
+
+
+
+
+
+#pragma omp parallel 
+	{
+
+#pragma omp sections 
+		{
+
+#pragma omp section
+			{
+				int i;
+       	for (int j = 0; j < 20 / 4; j++)
+				{
+					for (int k = 0; k < 64; k++)
+					{
+
+						i = 0;
+						while (i < 6)
+						{
+							if (ProteinsVector[j].codon[i] == CondonsVector[k].name)
+							{
+#pragma omp critical
+								{
+									ProteinsVector[j].count += CondonsVector[k].count;
+								}
+							}
+							i++;
+						}
+
+
+					}
+
+
+
+
+
+
+
+
+
+#pragma omp critical
+					{
+						cout << ProteinsVector[j].name << " |" << " count :" << ProteinsVector[j].count << " | Frequency : " << float(ProteinsVector[j].count) / float(Sum) * 100 << endl;
+					}
+
+
+				}
+			}
+
+
+		
+		
+#pragma omp section
+			{
+				int i;
+				for (int j = 20/4; j < 20 / 2; j++)
+				{
+					for (int k = 0; k < 64; k++)
+					{
+
+						i = 0;
+						while (i < 6)
+						{
+							if (ProteinsVector[j].codon[i] == CondonsVector[k].name)
+							{
+#pragma omp critical
+								{
+									ProteinsVector[j].count += CondonsVector[k].count;
+								}
+							}
+							i++;
+						}
+
+
+					}
+
+
+
+
+
+
+
+
+
+#pragma omp critical
+					{
+						cout << ProteinsVector[j].name << " |" << " count :" << ProteinsVector[j].count << " | Frequency : " << float(ProteinsVector[j].count) / float(Sum) * 100 << endl;
+					}
+
+
+				}
+			}
+
+
+
+
+	#pragma omp section
+			{
+				int i;
+       	for (int j = 20/2; j < (3*20) / 4; j++)
+				{
+					for (int k = 0; k < 64; k++)
+					{
+
+						i = 0;
+						while (i < 6)
+						{
+							if (ProteinsVector[j].codon[i] == CondonsVector[k].name)
+							{
+#pragma omp critical
+								{
+									ProteinsVector[j].count += CondonsVector[k].count;
+								}
+							}
+							i++;
+						}
+
+
+					}
+
+
+
+
+
+
+
+
+
+#pragma omp critical
+					{
+						cout << ProteinsVector[j].name << " |" << " count :" << ProteinsVector[j].count << " | Frequency : " << float(ProteinsVector[j].count) / float(Sum) * 100 << endl;
+					}
+
+
+				}
+			}
+
+
+		
+			
+#pragma omp section
+			{
+				int i;
+				for (int j = (3 * 20) / 4 ; j < 20 ; j++)
+				{
+					for (int k = 0; k < 64; k++)
+					{
+
+						i = 0;
+						while (i < 6)
+						{
+							if (ProteinsVector[j].codon[i] == CondonsVector[k].name)
+							{
+#pragma omp critical
+								{
+									ProteinsVector[j].count += CondonsVector[k].count;
+								}
+							}
+							i++;
+						}
+
+
+					}
+
+
+
+
+
+
+
+
+
+#pragma omp critical
+					{
+						cout << ProteinsVector[j].name << " |" << " count :" << ProteinsVector[j].count << " | Frequency : " << float(ProteinsVector[j].count) / float(Sum) * 100 << endl;
+					}
+
+
+				}
+			}
+
+
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		}
+	
+	
+	}
+
+
+
+
+
+
+
 
 }
 
@@ -529,32 +1062,58 @@ void OpenMPParallelExecution(vector<codon> &CondonsVector, vector<string> &my_ve
 
 
 
-void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string> &my_vector , vector<protein>&ProteinsVector)
+
+
+
+
+
+
+
+
+
+void OpenMPParallelExecutionSections(string FILE , vector<codon> &CondonsVector , vector<protein>&ProteinsVector)
 {
+
+	int count;
+	count = getNumberOfLines(FILE);
+	const int line_count = count;
+	vector<string> my_vector(line_count);
+	get_lines(FILE, my_vector);
+	CondonsVector_Intialization(CondonsVector, true);
+	ProteinsVector_Intialization(ProteinsVector, true);
+	
+	
+	
+	
 	string temp;
-	int i, j, k;
+	 int i, j, k;
 	cout << "please wait making data is being analyzed ..........." << endl;
 
 	
 #pragma omp  parallel for private(j,k,temp)
-	for (i = 0; i < my_vector.size(); i++)
+	for (i = 0; i < (int)my_vector.size(); i++)
 	{
 		 temp = "---";
-		int tid = omp_get_thread_num();
-		string cuurent_line = my_vector[i];
-		cout << cuurent_line << " is catched by thread : " << tid << endl;
-
-		for (j = 0; j < cuurent_line.size(); j += 3)
+		 string cuurent_line;
+#pragma omp critical
+		 {
+			 int tid = omp_get_thread_num();
+			  cuurent_line = my_vector[i];
+		 
+		 }
+		for (j = 0; j < (int)cuurent_line.size(); j += 3)
 		{
 			
-			temp[0] = cuurent_line[j];
-			temp[1] = cuurent_line[(j)+1];
-			temp[2] = cuurent_line[(j)+2];
- //#pragma omp critical
-	//		{
-		//		cout << temp << " is catched by thread : " << tid << endl;
-			//}
-			for (k = 0; k < CondonsVector.size(); k++)
+
+
+#pragma omp critical
+			{
+				temp[0] = cuurent_line[j];
+				temp[1] = cuurent_line[(j)+1];
+				temp[2] = cuurent_line[(j)+2];
+			}
+
+			for (k = 0; k < (int)CondonsVector.size(); k++)
 			{
 				if (temp == CondonsVector[k].name)
 				{
@@ -563,7 +1122,6 @@ void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string
 					{
 						CondonsVector[k].count += 1;
 					
-					//cout << CondonsVector[k].name << " is catched by thread : " << tid << "and incremented by one" << endl;
 					}
 					}
 
@@ -587,19 +1145,21 @@ void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string
 	int Sum = 0;
 #pragma omp  parallel for 
 
-	for (int k = 0; k < CondonsVector.size(); k++)
+	for ( k = 0; k < (int)CondonsVector.size(); k++)
 	{
 		
 		cout << CondonsVector[k].name << " |" << " count :" << CondonsVector[k].count << endl;
-		Sum += CondonsVector[k].count;
-
+#pragma omp critical
+		{
+			Sum += CondonsVector[k].count;
+		}
 	}
 
 
 #pragma omp  parallel for  private (k , i)
-	for (int j = 0; j < 20; j++)
+	for ( j = 0; j < 20; j++)
 	{
-		for (int k = 0; k < 64; k++)
+		for ( k = 0; k < 64; k++)
 		{
 			
 			i = 0;
@@ -618,43 +1178,13 @@ void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string
 		
 		}
 	
-	
-	
-	
-
- 
-
-
-	
-
-
-
+#pragma omp critical
+		{
+			cout << ProteinsVector[j].name << " |" << " count :" << ProteinsVector[j].count << " | Frequency : " << float(ProteinsVector[j].count) / float(Sum) * 100 << endl;
+		}
 
 	
 	}
-
-
-
-	cout << "-----------------------------------------------------------------------------" << endl;
-//#pragma omp  parallel for 
-	float freq=0;
-	for (int k = 0; k < ProteinsVector.size(); k++)
-	{
-		 freq += float(ProteinsVector[k].count )/ float(Sum);
-		cout << ProteinsVector[k].name << " |" << " count :" << ProteinsVector[k].count << " | Frequency : "<< float (ProteinsVector[k].count)/float(Sum) *100 << endl;
-
-
-
-	}
-	cout << "-----------------------------------------------------------------------------" << endl;
-	cout << "-----------------------------------------------------------------------------" << endl;
-	cout << "-----------------------------------------------------------------------------" << endl;
-	cout << "-----------------------------------------------------------------------------" << endl;
-	cout << "-----------------------------------------------------------------------------" << endl;
-	cout << "-----------------------------------------------------------------------------" << endl;
-
-
-	cout << freq << endl;
 
 
 
@@ -672,58 +1202,24 @@ void OpenMPParallelExecutionSections(vector<codon> &CondonsVector, vector<string
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int main()
 {
 	int fileSize = 0; 
 	string FILE = "InputSeq.dat.txt";
-
-
-	int  i;
-	//cout << "Enter the name of the text file containg the array with .txt\n";
-	//cin >> FILE;
-
-
-
-	int count = getNumberOfLines(FILE); 
-
-	cout << "There's "<<count << "Lines" << endl;
-	const int line_count = count ;
-	
-	vector<string> my_vector(line_count);
-	get_lines(FILE , my_vector);
-
-
 	vector<codon> CondonsVector(64);
-
 	vector<protein> ProteinsVector(20);
+	
+	
+	
+	TrySections(FILE, CondonsVector, ProteinsVector);
 
-	CondonsVector_Intialization(CondonsVector);
-	ProteinsVector_Intialization(ProteinsVector);
-	OpenMPParallelExecutionSections(CondonsVector, my_vector, ProteinsVector);
-
-
-
-
-
-
+	OpenMPParallelExecutionSections(FILE, CondonsVector, ProteinsVector);
+	
+	serialExecution(FILE, CondonsVector, ProteinsVector);
+	
+	
+	
+	
 
 
 
